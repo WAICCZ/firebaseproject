@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>簡易儲存資料的網站</title>
+  </head>
+  <body>
+    <h1>儲存資料到 Firebase</h1>
+    <form id="dataForm">
+      <label for="dataInput">輸入資料:</label>
+      <input type="text" id="dataInput" required />
+      <button type="submit">儲存資料</button>
+    </form>
+
+    <h2>已儲存資料:</h2>
+    <ul id="dataList"></ul>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        push,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyC7OLTiqJyVUjL1aODsfQtv2brj70aQ0sc",
+        authDomain: "project1-5ad8d.firebaseapp.com",
+        databaseURL: "https://project1-5ad8d-default-rtdb.firebaseio.com",
+        projectId: "project1-5ad8d",
+        storageBucket: "project1-5ad8d.appspot.com",
+        messagingSenderId: "209108181187",
+        appId: "1:209108181187:web:adbb8709d7a9afe0328276",
+        measurementId: "G-MX4EP375CS",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Reference to the 'data' node in the database
+      const dataRef = ref(database, "data");
+
+      // Handle form submission to save data
+      document.getElementById("dataForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const dataInput = document.getElementById("dataInput").value;
+        if (dataInput) {
+          // Push new data to the database
+          push(dataRef, { text: dataInput });
+          document.getElementById("dataInput").value = ""; // Clear the input field
+        }
+      });
+
+      // Retrieve and display data from the database
+      onValue(dataRef, (snapshot) => {
+        const dataList = document.getElementById("dataList");
+        dataList.innerHTML = ""; // Clear the list
+        snapshot.forEach((childSnapshot) => {
+          const childData = childSnapshot.val().text;
+          const li = document.createElement("li");
+          li.textContent = childData;
+          dataList.appendChild(li);
+        });
+      });
+    </script>
+  </body>
+</html>
